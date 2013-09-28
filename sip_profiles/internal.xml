@@ -1,0 +1,162 @@
+<profile name="internal">
+  <!--
+      This profile is used for registered users only.
+  -->
+
+  <aliases>
+  </aliases>
+
+  <domains>
+    <domain name="all" alias="true" parse="false"/>
+  </domains>
+
+  <settings>
+    <param name="debug" value="0"/>
+    <param name="sip-trace" value="no"/>
+    <param name="sip-capture" value="no"/>
+
+    <!--
+        Sometimes, in extremely rare edge cases, the Sofia SIP stack may stop
+        responding. These options allow you to enable and control a watchdog
+        on the Sofia SIP stack so that if it stops responding for the
+        specified number of milliseconds, it will cause FreeSWITCH to crash
+        immediately. This is useful if you run in an HA environment and
+        need to ensure automated recovery from such a condition. Note that if
+        your server is idle a lot, the watchdog may fire due to not receiving
+        any SIP messages. Thus, if you expect your system to be idle, you
+        should leave the watchdog disabled. It can be toggled on and off
+        through the FreeSWITCH CLI either on an individual profile basis or
+        globally for all profiles. So, if you run in an HA environment with a
+        master and slave, you should use the CLI to make sure the watchdog is
+        only enabled on the master.
+        If such crash occurs, FreeSWITCH will dump core if allowed. The
+        stacktrace will include function watchdog_triggered_abort().
+    -->
+    <param name="watchdog-enabled" value="no"/>
+    <param name="watchdog-step-timeout" value="30000"/>
+    <param name="watchdog-event-timeout" value="30000"/>
+
+    <param name="log-auth-failures" value="false"/>
+    <param name="forward-unsolicited-mwi-notify" value="false"/>
+
+    <param name="context" value="public"/>
+    
+    <param name="rfc2833-pt" value="101"/>
+    <!-- port to bind to for sip traffic -->
+    <param name="sip-port" value="$${internal_sip_port}"/>
+    <param name="dialplan" value="XML"/>
+    <param name="dtmf-duration" value="2000"/>
+    
+    <param name="inbound-codec-prefs" value="$${global_codec_prefs}"/>
+    <param name="outbound-codec-prefs" value="$${global_codec_prefs}"/>
+    
+    <param name="rtp-timer-name" value="soft"/>
+    <param name="rtp-ip" value="$${local_ip_v4}"/>
+    <param name="sip-ip" value="$${local_ip_v4}"/>
+    
+    <param name="hold-music" value="$${hold_music}"/>
+    <param name="apply-nat-acl" value="nat.auto"/>
+
+
+    <param name="local-network-acl" value="none"/>
+    
+    <!--<param name="dtmf-type" value="info"/>-->
+
+
+    <!-- 'true' means every time 'first-only' means on the first register -->
+    <!--<param name="send-message-query-on-register" value="true"/>-->
+
+    <!-- 'true' means every time 'first-only' means on the first register -->
+    <!--<param name="send-presence-on-register" value="first-only"/> -->
+
+
+    <!-- Caller-ID type (choose one, can be overridden by inbound call type and/or sip_cid_type channel variable -->
+    <!-- Remote-Party-ID header -->
+    <!--<param name="caller-id-type" value="rpid"/>-->
+
+    <!-- P-*-Identity family of headers -->
+    <!--<param name="caller-id-type" value="pid"/>-->
+
+    <!-- neither one -->
+    <!--<param name="caller-id-type" value="none"/>-->
+
+
+
+    <param name="record-path" value="$${recordings_dir}"/>
+    <param name="record-template" value="${caller_id_number}.${target_domain}.${strftime(%Y-%m-%d-%H-%M-%S)}.wav"/>
+    <!--enable to use presence -->
+    <param name="manage-presence" value="true"/>
+    <!-- send a presence probe on each register to query devices to send presence instead of sending presence with less info -->
+    <!--<param name="presence-probe-on-register" value="true"/>-->
+    <!--<param name="manage-shared-appearance" value="true"/>-->
+    <!-- used to share presence info across sofia profiles -->
+    <!-- Name of the db to use for this profile -->
+    <!--<param name="dbname" value="share_presence"/>-->
+    <param name="presence-hosts" value="$${domain},$${local_ip_v4}"/>
+    <param name="presence-privacy" value="$${presence_privacy}"/>
+    <!-- ************************************************* -->
+
+    <!--max number of open dialogs in proceeding -->
+    <param name="max-proceeding" value="1000"/>
+    
+    <param name="multiple-registrations" value="true"/>
+    
+    <param name="inbound-codec-negotiation" value="generous"/>
+    
+
+    <!-- Let calls hit the dialplan before selecting codec for the a-leg -->
+    <param name="inbound-late-negotiation" value="true"/>
+
+    <!-- Allow ZRTP clients to negotiate end-to-end security associations (also enables late negotiation) -->
+    <param name="inbound-zrtp-passthru" value="false"/>
+
+
+    <!--TTL for nonce in sip auth-->
+    <param name="nonce-ttl" value="60"/>
+
+    <param name="auth-calls" value="$${internal_auth_calls}"/>
+    
+    <!-- Force the user and auth-user to match. -->
+    <param name="inbound-reg-force-matching-username" value="true"/>
+    
+    <!-- on authed calls, authenticate *all* the packets not just invite -->
+    <param name="auth-all-packets" value="false"/>
+
+    <!-- external_sip_ip
+         Used as the public IP address for SDP.
+         Can be an one of:
+         ip address            - "12.34.56.78"
+         a stun server lookup  - "stun:stun.server.com"
+         a DNS name            - "host:host.server.com"
+         auto                  - Use guessed ip.
+         auto-nat              - Use ip learned from NAT-PMP or UPNP
+    -->
+    <param name="ext-rtp-ip" value="auto-nat"/>
+    <param name="ext-sip-ip" value="auto-nat"/>
+
+    <!-- rtp inactivity timeout -->
+    <param name="rtp-timeout-sec" value="300"/>
+    <param name="rtp-hold-timeout-sec" value="1800"/>
+    
+    <!--
+        Choose the realm challenge key. Default is auto_to if not set.
+
+        auto_from  - uses the from field as the value for the sip realm.
+        auto_to    - uses the to field as the value for the sip realm.
+        <anyvalue> - you can input any value to use for the sip realm.
+
+        If you want URL dialing to work you'll want to set this to auto_from.
+
+        If you use any other value besides auto_to or auto_from you'll
+        loose the ability to do multiple domains.
+
+        Note: comment out to restore the behavior before 2008-09-29
+    -->
+    <param name="challenge-realm" value="auto_from"/>
+
+    <param name="registration-thread-frequency" value="30"/>
+    <param name="all-reg-options-ping" value="true"/>
+    <param name="unregister-on-options-fail" value="true"/>
+
+  </settings>
+</profile>
