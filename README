@@ -2,7 +2,7 @@ Minimal FreeSWITCH configuration
 ================================
 
 This is a minimalistic FreeSWITCH configuration. It does nothing, yet it
-allows to run the FreeSWITCH daemon and connect to its console with
+allows starting the FreeSWITCH daemon and connecting to its console with
 fs_cli.
 
 The purpose of this configuration is to provide a base for new projects,
@@ -26,10 +26,10 @@ The following files are empty and are placed there to keep the
 FreeSWITCH XML preprocessor happy. Feel free to delete them after
 placing your own XML files:
 
-./ivr_menus/stub.xml
-./sip_profiles/external/stub.xml
-./directory/stub.xml
-./lang/en/ivr/stub.xml
+ivr_menus/stub.xml
+sip_profiles/external/stub.xml
+directory/stub.xml
+lang/en/ivr/stub.xml
 
 
 The SIP profiles are modified to allow multiple domains, as described in
