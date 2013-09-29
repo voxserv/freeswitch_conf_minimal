@@ -36,6 +36,11 @@ The SIP profiles are modified to allow multiple domains, as described in
 http://wiki.freeswitch.org/wiki/Multi-tenant
 
 
+autoload_configs/local_stream.conf.xml
+is modified to match the MOH paths in Debian packages
+
+autoload_configs/logfile.conf.xml
+logfile rotation is enabled
 
 Stanislav Sinyagin
 ssinyagin@k-open.com
