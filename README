@@ -40,7 +40,7 @@ autoload_configs/local_stream.conf.xml
 is modified to match the MOH paths in Debian packages
 
 autoload_configs/logfile.conf.xml
-logfile rotation is enabled
+logfile rotation is enabled, debug loglevel is disabled
 
 Stanislav Sinyagin
 ssinyagin@k-open.com
