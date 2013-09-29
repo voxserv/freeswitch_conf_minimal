@@ -1,6 +1,8 @@
 <!--
-    This context is the default for port 5080
-    Inbound calls from service providers are landed here
+    This context is the default for port 5080.
+    
+    Inbound calls from service providers and unauthenticated
+    calls from public Internet are landed here.
 -->
 
 <include>
@@ -9,32 +11,16 @@
     <extension name="common_variables" continue="true">
       <condition break="never">
         <action application="set" data="default_language=en"/>
-      </condition>
-      
-      <condition field="${ringback}" expression="^$" break="never">
-        <action application="set" data="ringback=${de-ring}"/>
-      </condition>
-      
+      </condition>      
+    </extension>
+    
+    <extension name="call_debug" continue="true">
       <condition field="${call_debug}" expression="^true$" break="never">
         <action application="info"/>
       </condition>
     </extension>
 
-    <!--
-        SIP Gateway profiles are extected to define two inbound variables:
-          domain: will define the domain and domain_name variables in the private context
-          target_context: defines the context to which the call would be transferred
-        Then the incoming calls on those SIP gateways would be forwarded accordingly to the
-        private context.
-    -->
-    
-    <extension name="pstn_inbound">
-      <condition field="${target_context}" expression="^[a-z]"/>
-      <condition field="${domain}" expression="^[a-z]">
-        <action application="set" data="domain_name=${domain}"/>        
-        <action application="transfer" data="${destination_number} XML ${target_context}"/>
-      </condition>
-    </extension>
+    <X-PRE-PROCESS cmd="include" data="public/*.xml"/>
     
   </context>
 </include>
