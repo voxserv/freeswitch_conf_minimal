@@ -14,10 +14,27 @@ FreeSWITCH version 1.2.13 (it should work also with any other FreeSWITCH
 version).
 
 
-Usage:
-
+Usage if you do everethyng as root:
+-----------------------------------
 cd /etc
 git clone https://github.com/xlab1/freeswitch_conf_minimal.git freeswitch
+
+
+Usage if you work as multiple non-root users:
+---------------------------------------------
+echo "umask 0007" >>~/.profile 
+umask 0007
+sudo adduser jsmith freeswitch
+sudo mkdir /etc/freeswitch
+sudo chgrp freeswitch /etc/freeswitch
+sudo chmod g+ws /etc/freeswitch
+cd /etc/freeswitch
+git init --shared=0660
+git pull https://github.com/xlab1/freeswitch_conf_minimal.git master
+
+
+
+
 
 Further on, you may want to set up your own project-specific Git
 repository and push new changes to it.
