@@ -13,11 +13,28 @@ Tested on Debian with packages from [http://files.freeswitch.org],
 FreeSWITCH version 1.2.13 (it should work also with any other FreeSWITCH
 version).
 
+Installing FreeSWITCH on Debian Wheezy
+--------------------------------------
+
+apt-get update && apt-get install -y curl git
+
+cat >/etc/apt/sources.list.d/freeswitch.list <<EOT
+deb http://files.freeswitch.org/repo/deb/debian/ wheezy main
+EOT
+
+curl http://files.freeswitch.org/repo/deb/debian/freeswitch_archive_g0.pub \
+| apt-key add -
+
+apt-get update && apt-get install -y freeswitch-meta-all 
+
+
+
 
 Usage if you do everethyng as root:
 -----------------------------------
 cd /etc
-git clone https://github.com/xlab1/freeswitch_conf_minimal.git freeswitch
+git clone https://github.com/voxserv/freeswitch_conf_minimal.git freeswitch
+
 
 
 Usage if you work as multiple non-root users:
@@ -30,7 +47,7 @@ sudo chgrp freeswitch /etc/freeswitch
 sudo chmod g+ws /etc/freeswitch
 cd /etc/freeswitch
 git init --shared=0660
-git pull https://github.com/xlab1/freeswitch_conf_minimal.git master
+git pull https://github.com/voxserv/freeswitch_conf_minimal.git master
 
 
 
