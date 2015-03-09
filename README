@@ -70,12 +70,21 @@ sip_profiles/internal/stub.xml
 The SIP profiles are modified to allow multiple domains, as described in
 http://wiki.freeswitch.org/wiki/Multi-tenant
 
+sip_profiles/internal.xml
+is modified not to alias with any domain in the directory
 
 autoload_configs/local_stream.conf.xml
 is modified to match the MOH paths in Debian packages
 
 autoload_configs/logfile.conf.xml
 logfile rotation is enabled, debug loglevel is disabled
+
+
+See also: tutorials in docs/ subfolder
+
+
+Author
+------
 
 Stanislav Sinyagin
 ssinyagin@k-open.com
