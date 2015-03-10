@@ -6,6 +6,15 @@ process SIP requests, but its dialplan is empty, so the calls would not
 go anywhere. This short tutorial lists the steps to get started with a
 simple PBX configuration.
 
+Further in this document, we refer to the standard FreeSWITCH
+configuration as "vanilla". The vanilla configuration introduces a
+dialplan that demonstrates lots of FreeSWITCH features, but it takes too
+much time to clean it up for your future production configuration. Also
+the vanilla configuration aliases all domains to the server's IPv4
+address, making the domain name part in user registrations
+indistinguishable. The minimal configuration enables the "multi-tenant"
+scenario, where domain name part of SIP users makes difference.
+
 DNS configuration
 -----------------
 
@@ -69,5 +78,69 @@ Dialplan contexts
 FreeSWITCH dialplan consists of contexts -- independent sets of matching
 rules and actions for the calls. Each call enters a context, and later
 it may be transferred to another context, or bridged with some remote
-party, or an application, such as playback, can be executed on it
-according to the matching rules and actions.
+party, or a dialplan application can be executed on it according to the
+matching rules and actions.
+
+The vanilla configuration defines two dialplan contexts: "public" is
+where all unauthenticated calls are landing, and "default" where calls
+to and from registered users are processed.
+
+The minimal configuration defines only the "public" context, leaving you
+the freedom to define other contexts as needed.
+
+The structure and contents of a dialplan are described in detail in
+FreeSWITCH wiki and in FreeSWITCH book. It is important to understand
+the two-pass processing workflow, the `continue` attribute in extensions
+and `break` attribute in conditions. Also you need to understand the
+meaning of `inline` attribute in the action statements.
+
+The file `dialplan/public/10_gateway_inbound.xml` in the minimal
+configuration defines a simple dispatcher for inbound calls from SIP
+gateways. It expects the SIP gateway to define two variables:
+`target_context` and `domain`, and if both are defined, the inbound call
+is transferred into the specified context, with `${domain}` variable set
+to the domain name. This allows you, for example, to use multiple SIP
+trunks in a multi-tenant configuration, so that each trunk is used for a
+different tenant and its own context. The following example of a SIP
+gateway demonstrates the feature:
+
+```
+<!-- File: sip_profiles/external/sipcall.ch.xml -->
+  <gateway name="sipcall_41449999990">
+    <param name="username" value="41449999990"/>
+    <param name="proxy" value="business1.voipgateway.org"/>
+    <param name="password" value="xxxxxxxxxx"/>
+    <param name="expire-seconds" value="600"/>
+    <param name="register" value="true"/>
+    <param name="register-transport" value="udp"/>
+    <param name="retry-seconds" value="30"/>
+    <param name="caller-id-in-from" value="true"/>
+    <param name="ping" value="36"/>
+    <variables>
+      <variable name="domain"
+                value="int.example.net" direction="inbound"/>
+      <variable name="target_context"
+                value="int.example.net" direction="inbound"/>
+    </variables>
+  </gateway>  
+```
+
+Another common approach is to set up matching patterns in the public
+context, each matching a particular phone number or a range of numbers,
+and making a transfer to a specific extension:
+
+```
+<!-- File: dialplan/public/20_inbound_did.xml -->
+  <extension name="0449999990">  <!-- Hotline -->
+    <condition field="destination_number" expression="^0449999990$">
+      <action application="transfer" data="7000 XML int.example.net"/>
+    </condition>
+  </extension>  
+  <extension name="0449999991"> <!-- Automatic Attendant -->
+    <condition field="destination_number" expression="^0449999991$">
+      <action application="transfer" data="7800 XML int.example.net"/>
+    </condition>
+  </extension>
+```
+
+
