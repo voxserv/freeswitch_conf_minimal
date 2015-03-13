@@ -1,6 +1,10 @@
 Simple PBX tutorial
 ===================
 
+Copyright (c) 2015 Stanislav Sinyagin <ssinyagin@k-open.com>
+
+This document is a work in progress.
+
 After installing the minimal config, your FreeSWITCH server is able to
 process SIP requests, but its dialplan is empty, so the calls would not
 go anywhere. This short tutorial lists the steps to get started with a
@@ -13,15 +17,20 @@ much time to clean it up for your future production configuration. Also
 the vanilla configuration aliases all domains to the server's IPv4
 address, making the domain name part in user registrations
 indistinguishable. The minimal configuration enables the "multi-tenant"
-scenario, where domain name part of SIP users makes difference.
+scenario, where domain name part of SIP users makes difference. Even if
+you're not planning multiple domains on our FreeSWITCH server,
+multi-tenant configuration stil has its benefits. One of the benefits is
+that you can mix SIP users that connect via IPv4 and IPv6 in the same
+domain and let them communicate to each ther.
+
 
 DNS configuration
 -----------------
 
 First of all, you need to choose a domain name for your SIP service. Or
-better two different domain names: 1) for internal users to use for SIP
-client registration; 2) for external SIP peers to send unauthenticated
-calls to your server.
+even better, two different domain names: 1) for internal users to use
+for SIP client registration; 2) for external SIP peers to send
+unauthenticated calls to your server.
 
 In this example, we use `int.example.net` as a domain name for internal
 SIP client registrations, and `pub.example.net` as a domain name for
@@ -29,18 +38,18 @@ external peers to call out to our server.
 
 Thus, the SIP clients would use accounts like `701@int.example.net` for
 registering on our server, and external peers would use SIP URL like
-`sip:attendant@pub.example.net` to place an unauthenticated call to our
+`sip:attendant@pub.example.net` to place unauthenticated calls to our
 server.
 
 Most modern SIP clients lookup first a NAPTR DNS record in order to find
 out the SIP service that is serving the domain. Some DNS hosting
-providers (godaddy.com, for example) do not allow adding NAPTR records
+providers (`godaddy.com`, for example) do not allow adding NAPTR records
 via their DNS editing GUI. A simple solution would be to point an NS
 record for a subdomain to some alternative DNS hosting, such as
-dns.he.net.
+`dns.he.net`.
 
-It is also not too dramatic if there is no NAPR record for your
-domain. Most clients fall back to an SRV record if they don't find a
+It is also not too dramatic if there is no NAPTR record for your
+domain. Most clients fall back to the SRV record if they don't find a
 NAPTR record for the SIP domain.
 
 Also if a Windows server is used as a DNS resolver in your LAN, the
@@ -94,15 +103,19 @@ the two-pass processing workflow, the `continue` attribute in extensions
 and `break` attribute in conditions. Also you need to understand the
 meaning of `inline` attribute in the action statements.
 
+
+`public` dialplan context
+-------------------------
+
 The file `dialplan/public/10_gateway_inbound.xml` in the minimal
 configuration defines a simple dispatcher for inbound calls from SIP
 gateways. It expects the SIP gateway to define two variables:
 `target_context` and `domain`, and if both are defined, the inbound call
-is transferred into the specified context, with `${domain}` variable set
-to the domain name. This allows you, for example, to use multiple SIP
-trunks in a multi-tenant configuration, so that each trunk is used for a
-different tenant and its own context. The following example of a SIP
-gateway demonstrates the feature:
+is transferred into the specified context, with `${domain_name}`
+variable set to the domain name. This allows you, for example, to use
+multiple SIP trunks in a multi-tenant configuration, so that each trunk
+is used for a different tenant and its own context. The following
+example of a SIP gateway demonstrates the feature:
 
 ```
 <!-- File: sip_profiles/external/sipcall.ch.xml -->
@@ -144,3 +157,47 @@ and making a transfer to a specific extension:
 ```
 
 
+`int.example.net` dialplan context
+----------------------------------
+
+In  this  example,  registered  users  can dial  7xx  to  reach  another
+registered  user,  500 for  audio  conference  (unmodetared, anyone  can
+join),  and  anything  that starts  with  `0`  or  `1`  or `+`  goes  to
+PSTN. Calls to PSTN are processed  in a separate context -- this is done
+to simplify  the logic and to  let you manage PSTN  calls from different
+internal contexts in a single place.
+
+```
+<!-- File: dialplan/int.example.net.xml -->
+<include>
+  <context name="int.example.net">
+  
+  <extension name="Local_Extension">
+    <condition field="destination_number" expression="^(7\d\d)$">
+      <action application="set" data="dialed_extension=$1"/>
+      <action application="set" data="ringback=${de-ring}"/>
+      <action application="set" data="transfer_ringback=$${hold_music}"/>
+      <action application="set" data="call_timeout=60"/>
+      <action application="set" data="hangup_after_bridge=true"/>
+      <action application="bridge"
+              data="user/${dialed_extension}@${domain_name}"/>
+    </condition>
+  </extension>
+  
+  <extension name="conference">
+    <condition field="destination_number" expression="^500$">
+      <action application="answer"/>
+      <action application="sleep" data="500"/>
+      <action application="conference" data="example_net"/>
+    </condition>
+  </extension>
+
+  <extension name="pstnout">
+    <condition field="destination_number" expression="^[01+]">
+      <action application="transfer" data="${destination_number} XML pstnout"/>
+    </condition>
+  </extension>
+
+  </context>
+</include>
+```
