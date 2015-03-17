@@ -41,6 +41,10 @@ registering on our server, and external peers would use SIP URL like
 `sip:attendant@pub.example.net` to place unauthenticated calls to our
 server.
 
+If you don't plan to receive calls via SIP URL from external peers, the
+DNS entry for unauthenticated calls is not necessary (although some ITSP
+use this to accept calls on DID numbers).
+
 Most modern SIP clients lookup first a NAPTR DNS record in order to find
 out the SIP service that is serving the domain. Some DNS hosting
 providers (`godaddy.com`, for example) do not allow adding NAPTR records
