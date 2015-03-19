@@ -427,12 +427,101 @@ all.
 ```
 
 
+Firewall settings
+-----------------
+
+The following example is deploying `iptables` rules that limit the rate
+of SIP requests to your server, thus preventing attackers from
+overloading your FreeSWITCH instance. Depending on your scalability
+requirements, the rate of allowed SIP messages can be increased. You may
+also have requirements for a more strict firewall policy, and add rules
+that reject completely certain kind of traffic.
+
+The following example is suitable for Debian and can be simply
+copy-pasted to the command line.
+
+```
+apt-get install -y iptables-persistent
+
+#####  IPv4 rules #####
+iptables -N dos-filter-sip-external
+
+iptables -A INPUT -p udp -m udp --dport 5060 \
+-j dos-filter-sip-external
+
+iptables -A INPUT -p tcp -m tcp --dport 5060 \
+-j dos-filter-sip-external
+
+iptables -A INPUT -p udp -m udp --dport 5080 \
+-j dos-filter-sip-external
+
+iptables -A dos-filter-sip-external \
+-m hashlimit --hashlimit 5/sec \
+--hashlimit-burst 30 --hashlimit-mode srcip \
+--hashlimit-name REGISTER --hashlimit-htable-size 24593 \
+--hashlimit-htable-expire 90000 -j RETURN
+
+iptables -A dos-filter-sip-external -j \
+REJECT --reject-with icmp-admin-prohibited
+
+iptables -N dos-filter-ssh
+
+iptables -I INPUT -p tcp -m tcp --dport 22 \
+--tcp-flags FIN,SYN,RST,ACK SYN -j dos-filter-ssh
+
+iptables -A dos-filter-ssh -m hashlimit --hashlimit 3/min \
+--hashlimit-burst 10 --hashlimit-mode srcip,dstip \
+--hashlimit-name ssh_hash --hashlimit-htable-expire 60000 \
+-j ACCEPT
+
+iptables -A dos-filter-ssh -j DROP
+
+iptables-save > /etc/iptables/rules.v4
+
+#####  IPv6 rules #####
+
+ip6tables -N dos-filter-sip-external
+
+ip6tables -A INPUT -p udp -m udp --dport 5060 \
+-j dos-filter-sip-external
+
+ip6tables -A INPUT -p tcp -m tcp --dport 5060 \
+-j dos-filter-sip-external
+
+ip6tables -A INPUT -p udp -m udp --dport 5080 \
+-j dos-filter-sip-external
+
+ip6tables -A dos-filter-sip-external \
+-m hashlimit --hashlimit 5/sec \
+--hashlimit-burst 30 --hashlimit-mode srcip \
+--hashlimit-name REGISTER --hashlimit-htable-size 24593 \
+--hashlimit-htable-expire 90000 -j RETURN
+
+ip6tables -A dos-filter-sip-external -j \
+REJECT --reject-with icmp6-adm-prohibited
+
+ip6tables -N dos-filter-ssh
+
+ip6tables -I INPUT -p tcp -m tcp --dport 22 \
+--tcp-flags FIN,SYN,RST,ACK SYN -j dos-filter-ssh
+
+ip6tables -A dos-filter-ssh -m hashlimit --hashlimit 3/min \
+--hashlimit-burst 10 --hashlimit-mode srcip,dstip \
+--hashlimit-name ssh_hash --hashlimit-htable-expire 60000 \
+-j ACCEPT
+
+ip6tables -A dos-filter-ssh -j DROP
+
+ip6tables-save > /etc/iptables/rules.v6
+```
+
+
 Conclusion
 ----------
 
 After following this tutorial, you would get a basic PBX which allows
 the SIP users to register and place and receive calls. It also
-demonstrates varipus features, such as fallback scenarion when the SIP
+demonstrates various features, such as fallback scenario when the SIP
 user is not available.
 
 There are many other topics which might be interesting to implement,
