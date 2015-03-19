@@ -458,7 +458,7 @@ iptables -A INPUT -p udp -m udp --dport 5080 \
 iptables -A dos-filter-sip-external \
 -m hashlimit --hashlimit 5/sec \
 --hashlimit-burst 30 --hashlimit-mode srcip \
---hashlimit-name REGISTER --hashlimit-htable-size 24593 \
+--hashlimit-name SIPMSG --hashlimit-htable-size 24593 \
 --hashlimit-htable-expire 90000 -j RETURN
 
 iptables -A dos-filter-sip-external -j \
@@ -494,7 +494,7 @@ ip6tables -A INPUT -p udp -m udp --dport 5080 \
 ip6tables -A dos-filter-sip-external \
 -m hashlimit --hashlimit 5/sec \
 --hashlimit-burst 30 --hashlimit-mode srcip \
---hashlimit-name REGISTER --hashlimit-htable-size 24593 \
+--hashlimit-name SIPMSG --hashlimit-htable-size 24593 \
 --hashlimit-htable-expire 90000 -j RETURN
 
 ip6tables -A dos-filter-sip-external -j \
