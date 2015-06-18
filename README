@@ -25,7 +25,7 @@ EOT
 curl http://files.freeswitch.org/repo/deb/debian/freeswitch_archive_g0.pub \
 | apt-key add -
 
-apt-get update && apt-get install -y freeswitch-meta-all 
+apt-get update && apt-get install -y freeswitch-all 
 
 
 
