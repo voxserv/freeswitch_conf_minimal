@@ -1,0 +1,37 @@
+<include>
+  <extension name="speech_2min">
+    <condition field="destination_number" expression="^speech_2min$">
+      <action application="answer"/>
+      <action application="playback" data="silence_stream://1000"/>
+      <action application="playback" data="/opt/sound/ITU-T_P_50_BRITISH_ENGLISH.wav"/>
+      <action application="playback" data="silence_stream://10000"/>
+      <action application="hangup"/>
+    </condition>
+  </extension>
+
+  <extension name="silence_2min">
+    <condition field="destination_number" expression="^silence_2min$">
+      <action application="answer"/>
+      <action application="playback" data="silence_stream://130000"/>
+      <action application="hangup"/>
+    </condition>
+  </extension>
+
+  <extension name="echo">
+    <condition field="destination_number" expression="^echo$">
+      <action application="jitterbuffer" data="60:200:20"/>
+      <action application="set" data="echo_decode_audio=true"/>
+      <action application="answer"/>
+      <action application="echo"/>
+    </condition>
+  </extension>
+
+  <extension name="echodelay">
+    <condition field="destination_number" expression="^echodelay$">
+      <action application="jitterbuffer" data="60:200:20"/>
+      <action application="set" data="echo_decode_audio=true"/>
+      <action application="answer"/>
+      <action application="delay_echo" data="1000"/>
+    </condition>
+  </extension>
+</include>
