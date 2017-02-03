@@ -7,3 +7,5 @@ RUN apt-get update && apt-get install -y curl git freeswitch-meta-all
 
 RUn rm -r /etc/freeswitch/* || true
 ADD overlay/etc/freeswitch/ /etc/freeswitch/
+
+CMD ["/usr/bin/freeswitch"]
