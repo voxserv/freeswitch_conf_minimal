@@ -11,7 +11,7 @@ unneeded features.
 Tested on Debian with packages from [http://files.freeswitch.org].
 
 
-## Usage if you do everethyng as root
+## Usage if you do everything as root
 
 <pre><code>
 cd /tmp
