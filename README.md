@@ -1,4 +1,4 @@
-= Minimal FreeSWITCH configuration
+# Minimal FreeSWITCH configuration
 
 This is a minimalistic FreeSWITCH configuration. It does not do anyting,
 yet it allows starting the FreeSWITCH daemon and connecting to its
@@ -11,7 +11,7 @@ unneeded features.
 Tested on Debian with packages from [http://files.freeswitch.org].
 
 
-== Usage if you do everethyng as root
+## Usage if you do everethyng as root
 
 <pre><code>
 cd /tmp
@@ -19,7 +19,7 @@ git clone https://github.com/voxserv/freeswitch_conf_minimal.git freeswitch
 cp -r freeswitch/overlay/etc/freeswitch /etc/
 </code></pre>
 
-== Usage if you work as multiple non-root users
+## Usage if you work as multiple non-root users
 
 <pre><code>
 echo "umask 0007" >>~/.profile 
@@ -34,14 +34,14 @@ git clone https://github.com/voxserv/freeswitch_conf_minimal.git freeswitch
 cp -r freeswitch/overlay/etc/freeswitch /etc/
 </code></pre>
 
-== Usage with Docker
+## Usage with Docker
 
 <pre><code>
 docker build -t freewswitch .
 docker run --rm -it freeswitch
 </code></pre>
 
-== Installing FreeSWITCH on Debian Jessie
+## Installing FreeSWITCH on Debian Jessie
 
 <pre><code>
 apt-get update && apt-get install -y curl git
@@ -87,7 +87,7 @@ logfile rotation is enabled, debug loglevel is disabled
 See also: tutorials in docs/ subfolder
 
 
-== Author
+## Author
 
 Stanislav Sinyagin
 ssinyagin@k-open.com
