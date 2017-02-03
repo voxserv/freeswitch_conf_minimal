@@ -3,9 +3,9 @@ MAINTAINER Nicolás Pace <nico@libre.ws>
 
 RUN echo deb http://files.freeswitch.org/repo/deb/debian/ wheezy main > /etc/apt/sources.list.d/freeswitch.list
 RUN curl http://files.freeswitch.org/repo/deb/debian/freeswitch_archive_g0.pub | apt-key add -
-RUN apt-get update && apt-get install -y curl git freeswitch-meta-all 
+RUN apt-get update && apt-get install -y curl git freeswitch-meta-all && apt-get clean && rm -rf /var/lib/apt/lists/*
 
-RUn rm -r /etc/freeswitch/* || true
+RUN rm -r /etc/freeswitch/* || true
 ADD overlay/etc/freeswitch/ /etc/freeswitch/
 
 CMD ["/usr/bin/freeswitch"]

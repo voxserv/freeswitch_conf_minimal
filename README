@@ -14,10 +14,9 @@ Tested on Debian with packages from [http://files.freeswitch.org].
 
 Usage if you do everethyng as root:
 -----------------------------------
-cd /etc
+cd /tmp
 git clone https://github.com/voxserv/freeswitch_conf_minimal.git freeswitch
-
-
+cp -r freeswitch/overlay/etc/freeswitch /etc/
 
 Usage if you work as multiple non-root users:
 ---------------------------------------------
@@ -27,10 +26,16 @@ sudo adduser jsmith freeswitch
 sudo mkdir /etc/freeswitch
 sudo chgrp freeswitch /etc/freeswitch
 sudo chmod g+ws /etc/freeswitch
-cd /etc/freeswitch
-git init --shared=0660
-git pull https://github.com/voxserv/freeswitch_conf_minimal.git master
+rm -r /etc/freeswitch
+cd /tmp
+git clone https://github.com/voxserv/freeswitch_conf_minimal.git freeswitch
+cp -r freeswitch/overlay/etc/freeswitch /etc/
 
+Usage with Docker:
+-----------------
+
+docker build -t freewswitch .
+docker run --rm -it freeswitch
 
 
 Installing FreeSWITCH on Debian Jessie
